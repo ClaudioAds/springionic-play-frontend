@@ -31,6 +31,7 @@ export class ProfilePage {
       },
        error => {
          if (error.status == 403) {
+           // esse controlador é responsável pelo redirecionamento
            this.navCtrl.setRoot('HomePage');
          }
        });
