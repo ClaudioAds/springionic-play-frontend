@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { AlertController, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { CidadeDTO } from '../../models/cidade.dto';
 import { EstadoDTO } from '../../models/estado.dto';
 import { CidadeService } from '../../services/domain/cidade.service';
+import { ClienteService } from '../../services/domain/cliente.service';
 import { EstadoService } from '../../services/domain/estado.service';
 
 @IonicPage()
@@ -22,7 +23,9 @@ export class SignupPage {
     public navParams: NavParams,
     public formBuilder: FormBuilder,
     public cidadeService: CidadeService,
-    public estadoService: EstadoService) {
+    public estadoService: EstadoService,
+    public clienteService: ClienteService,
+    public alertCtrl: AlertController) {
 
     this.formGroup = this.formBuilder.group({
       //O validatos faz as validações dos campos
@@ -68,6 +71,28 @@ export class SignupPage {
   }
 
   signupUser() {
-    console.log('Enviou o form');
+    console.log(this.formGroup.value);
+    this.clienteService.insert(this.formGroup.value)
+    .subscribe(response => {
+      this.showInsertOk();
+    },
+    error => {});
+  }
+  //Criando um alert para sucesso
+  showInsertOk() {
+    let alert = this.alertCtrl.create({
+      title: 'Sucesso!',
+      message: 'Cadastro efetuado com sucesso',
+      enableBackdropDismiss: false, //para fechar somente clicando no x... Se for true, pode clicar em qualquer lugar
+      buttons: [
+        {
+          text: 'Ok',
+          handler: () => {//função anônima que executa
+            this.navCtrl.pop();//o pop vai desempilhar as páginas que foram colocadas sobre a de login
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 }
