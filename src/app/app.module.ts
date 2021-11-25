@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.services';
 import { StorageService } from '../services/storage.service';
 import { ClienteService } from '../services/domain/cliente.service';
 import { AuthInterceptorProvider } from '../interceptors/auth.inteceptor';
-import { ProdutoService } from '../services/categoria.service';
+import { ProdutoService } from '../services/domain/produto.service';
 
 @NgModule({
   declarations: [
