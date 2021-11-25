@@ -30,9 +30,9 @@ export class CategoriasPage {
     error => {});
 
   }
-
-  showProdutos() {
-    this.navCtrl.push('ProdutosPage');
+  //id para fazer a busca no back-end
+  showProdutos(categoria_id : string) { //parametro e valor que vem
+    this.navCtrl.push('ProdutosPage', {categoria_id: categoria_id});//passando parametros de uma pagina para outra
   }
 
 }
