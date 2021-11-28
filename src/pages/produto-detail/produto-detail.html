@@ -8,6 +8,11 @@
 </ion-header>
 
 <ion-content padding>
+  <!-- tag para icone do carrinho de compras-->
+  <!-- O navPush direciona para a página que quiser -->
+  <ion-fab top right edge>
+    <button navPush="CartPage" ion-fab mini><ion-icon name="cart"></ion-icon></button>
+  </ion-fab>
   <ion-card>
     <img [src]="item?.imageUrl || 'assets/imgs/prod.jpg'">
     <ion-card-content>
