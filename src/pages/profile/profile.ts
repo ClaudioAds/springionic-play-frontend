@@ -18,9 +18,9 @@ export class ProfilePage {
   picture: string;
 
   cameraOn: boolean = false;
-  
+
   constructor(
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public navParams: NavParams,
     public storage: StorageService,
     public clienteService: ClienteService,
@@ -28,21 +28,26 @@ export class ProfilePage {
   }
 
   ionViewDidLoad() {
+    this.loadData();
+  }
+
+  //função para recarregar os dados da página
+  loadData() {
     let localUser = this.storage.getLocalUser();
     if (localUser && localUser.email) {
       this.clienteService.findByEmail(localUser.email)
-      .subscribe(response => {
-        //afirmando pro compilador que os dados da resposta serão iguais aos do cliente completo
-        //as é um cast
-        this.cliente = response as ClienteDTO;
-        this.getImageIfExists();
-      },
-       error => {
-         if (error.status == 403) {
-           // esse controlador é responsável pelo redirecionamento
-           this.navCtrl.setRoot('HomePage');
-         }
-       });
+        .subscribe(response => {
+          //afirmando pro compilador que os dados da resposta serão iguais aos do cliente completo
+          //as é um cast
+          this.cliente = response as ClienteDTO;
+          this.getImageIfExists();
+        },
+          error => {
+            if (error.status == 403) {
+              // esse controlador é responsável pelo redirecionamento
+              this.navCtrl.setRoot('HomePage');
+            }
+          });
     }
     else {
       this.navCtrl.setRoot('HomePage');
@@ -51,10 +56,10 @@ export class ProfilePage {
 
   getImageIfExists() {
     this.clienteService.getImageFromBucket(this.cliente.id)
-    .subscribe(response => {
-      this.cliente.imageUrl = `${API_CONFIG.bucketBaseUrl}/cp${this.cliente.id}.jpg`;
-    },
-    error => {});
+      .subscribe(response => {
+        this.cliente.imageUrl = `${API_CONFIG.bucketBaseUrl}/cp${this.cliente.id}.jpg`;
+      },
+        error => { });
   }
 
   getCameraPicture() {
@@ -67,10 +72,24 @@ export class ProfilePage {
       mediaType: this.camera.MediaType.PICTURE
     }
     this.camera.getPicture(options).then((imageData) => {
-    this.picture = 'data:image/png;base64,' + imageData;
-    this.cameraOn = false;
-     }, (err) => {
-     });
+      this.picture = 'data:image/png;base64,' + imageData;
+      this.cameraOn = false;
+    }, (err) => {
+    });
   }
 
+  sendPicture() {
+    this.clienteService.uploadPicture(this.picture)
+      .subscribe(response => {
+        this.picture = null;
+        this.loadData();
+      },
+      error => {
+      });
+  }
+
+  //método para descartar a imagem
+  cancel(){
+    this.picture = null;
+  }
 }
