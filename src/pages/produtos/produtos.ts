@@ -11,7 +11,11 @@ import { ProdutoService } from '../../services/domain/produto.service';
 })
 export class ProdutosPage {
 
-  items: ProdutoDTO[];
+  //para fazer concatenação de paginas no front e back
+  items : ProdutoDTO[] = [];
+
+  //para controle da paginação
+  page : number = 0;
 
   constructor(
     public navCtrl: NavController,
@@ -28,19 +32,23 @@ export class ProdutosPage {
     let categoria_id = this.navParams.get('categoria_id');
     let loader = this.presentingLoading();
     //pegando o id dos campos
-    this.produtoService.findByCategoria(categoria_id)
+    this.produtoService.findByCategoria(categoria_id, this.page, 10) //indo buscar de 10 em 10
       .subscribe(response => {//esse id que ta vindo do back vem paginado
-        this.items = response['content'];// no content tem os produtos por categoria
+        let start = this.items.length; //pegando o tamanho da lista inicial
+        this.items = this.items.concat(response['content']);// no content tem os produtos por categoria
+        let end = this.items.length - 1;//pegando o tamanho da lista final
         loader.dismiss();
-        this.loadImageUrls();
+        console.log(this.page);
+        console.log(this.items);
+        this.loadImageUrls(start, end);
       },
-        error => {
-          loader.dismiss();
-        });
+      error => {
+        loader.dismiss();
+      });
   }
 
-  loadImageUrls() {
-    for (var i=0; i<this.items.length; i++) {
+  loadImageUrls(start: number, end: number) {
+    for (var i=start; i<end; i++) {
       let item = this.items[i];
       this.produtoService.getSmallImageFromBucket(item.id)
         .subscribe(response => {
@@ -63,9 +71,19 @@ export class ProdutosPage {
   }
 
   doRefresh(refresher) {
+    this.page = 0;
+    this.items = [];
     this.loadData();
     setTimeout(() => {
       refresher.complete();
+    }, 1000);
+  }
+
+  doInfinite(infiniteScroll) {
+    this.page++;//incrementa a página a cada chamada do método
+    this.loadData();//carrega mais dados para a próxima
+    setTimeout(() => {
+      infiniteScroll.complete();
     }, 1000);
   }
 }
